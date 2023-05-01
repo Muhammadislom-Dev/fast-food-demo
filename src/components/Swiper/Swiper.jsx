@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import "./Swiper.css";
@@ -12,7 +12,6 @@ import { FreeMode, Navigation, Thumbs } from "swiper";
 
 export default function SwiperFood() {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
-  const [swippers, setSwippers] = useState([]);
 
   return (
     <div className="swiper swipers">

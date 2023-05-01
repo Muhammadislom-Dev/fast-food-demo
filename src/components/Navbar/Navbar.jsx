@@ -66,7 +66,7 @@ const Navbar = () => {
               <Link
                 onClick={handleAddClass}
                 className="navbar-link"
-                to="/footer">
+                to="/">
                 Контакты
               </Link>
             </li>
