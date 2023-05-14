@@ -36,9 +36,8 @@ const Navbar = () => {
     });
     evt.currentTarget.classList.add("navbar__link-active");
   };
-
   function incrementCount() {
-    count = count + 1;
+    count = count - 0 + 1;
     setCount(count);
   }
   function decrementCount() {
@@ -110,6 +109,8 @@ const Navbar = () => {
       handleClose();
     }
   }
+
+  console.log(orderFoods);
   return (
     <div className="navbar">
       <div className="container">
@@ -148,27 +149,30 @@ const Navbar = () => {
         </button>
         <div className="modal-box">
           <ul className="modal-list">
-            {orderFoods.map((food) => (
+            {orderFoods?.map((food) => (
               <li className="modal-item">
-                <img className="modal-img" src={food.img} />
-                <p className="modal-title">{food.title}</p>
+                <img
+                  className="modal-img"
+                  src={`https://fastfood.dipsag.uz/api/uploads/images/${food[0]?.image_src}`}
+                />
+                <p className="modal-title">{food[0]?.title_en}</p>
                 <div className="modal-blok">
                   <button className="modal-minus" onClick={decrementCount}>
                     -
                   </button>
-                  <span className="modal-count">{food.count}</span>
+                  <span className="modal-count">{food?.count}</span>
                   <button className="modal-plus" onClick={incrementCount}>
                     +
                   </button>
                 </div>
                 <p className="modal-price">
-                  {(food.price * food.count).toFixed(1)} сум
+                  {(food[0].price * food.count).toFixed(1)} сум
                 </p>
                 <button
                   className="modal-btn"
                   onClick={() => {
                     setOrderFoods(
-                      orderFoods.filter((ovqat) => ovqat.id !== food.id)
+                      orderFoods.filter((meal) => meal.id !== food[0].id)
                     );
                   }}>
                   <RiDeleteBinLine />
