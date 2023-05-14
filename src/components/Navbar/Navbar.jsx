@@ -3,18 +3,31 @@ import Bscard from "../Lib/Bscard";
 import { Link } from "react-router-dom";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { IoCloseOutline } from "react-icons/io5";
-
-import Modal from "../Modal/Modal";
-
+import SModal from "../Modal/Modal";
 import { Context } from "../../context/orderFoods";
 import { useContext, useState } from "react";
+import { Button, TextField } from "@mui/material";
+import Box from "@mui/material/Box";
+import Modal from "@mui/material/Modal";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 500,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+  display: "flex",
+  flexDirection: "column",
+};
 
 const Navbar = () => {
   let [count, setCount] = useState(1);
   const { orderFoods, setOrderFoods } = useContext(Context);
-  const [loginModal, setLoginModal] = useState(false);
   const [korzinkaModal, setKorzinkaModal] = useState(false);
-  const [deleteKorzinkaModal, setDeleteKorzinkaModal] = useState(false);
 
   const handleAddClass = (evt) => {
     const links = document.querySelectorAll(".navbar__link-active");
@@ -39,18 +52,64 @@ const Navbar = () => {
   function openKorzinkaModal() {
     setKorzinkaModal(!korzinkaModal);
   }
-  function openDeleteKorzinkaModal() {
-    setDeleteKorzinkaModal(!deleteKorzinkaModal);
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => {
+    setOpen(true);
+    setKorzinkaModal();
+  };
+  const handleClose = () => setOpen(false);
+
+  const [nameValue, setNameValue] = useState("");
+  const [numberValue, setNumberValue] = useState("");
+
+  const [, setInvalidName] = useState(false);
+  const [, setInvalidNumber] = useState(false);
+
+  function changeNumber(item) {
+    setNumberValue(item);
+    setInvalidNumber(false);
   }
 
-  function openLoginModal() {
-    setLoginModal(!loginModal);
-  }
-  const [registerModal, setRegisterModal] = useState(false);
-  function openRegisterModal() {
-    setRegisterModal(!registerModal);
+  function changeName(item) {
+    setNameValue(item);
+    setInvalidName(false);
   }
 
+  let bot = {
+    TOKEN: "6199941139:AAG5VGAAgU-h7bxiFFdZp5EUeQPnGbYiA1w",
+    chatID: "-1001809300543",
+    message: `
+      Assalomu alaykum sizga yangi buyurtma xabari!%0A
+      %0AIsmi 👤: ${nameValue}; 
+      %0ATelefon raqami ☎: ${numberValue}`,
+  };
+
+  function sendMessage() {
+    if (nameValue === "") {
+      setInvalidName(true);
+    } else if (numberValue === "") {
+      setInvalidNumber(true);
+    } else {
+      fetch(
+        `https://api.telegram.org/bot${bot.TOKEN}/sendMessage?chat_id=${bot.chatID}&text=${bot.message} `,
+        {
+          method: "GET",
+        }
+      ).then(
+        (success) => {
+          console.log("send message");
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+
+      setNameValue("");
+      setNumberValue("");
+      handleClose();
+    }
+  }
   return (
     <div className="navbar">
       <div className="container">
@@ -63,10 +122,7 @@ const Navbar = () => {
               </Link>
             </li>
             <li className="navbar-item">
-              <Link
-                onClick={handleAddClass}
-                className="navbar-link"
-                to="/">
+              <Link onClick={handleAddClass} className="navbar-link" to="/">
                 Контакты
               </Link>
             </li>
@@ -86,43 +142,77 @@ const Navbar = () => {
         </div>
       </div>
 
-      <Modal className="modal" show={korzinkaModal}>
+      <SModal className="modal" show={korzinkaModal}>
         <button className="close-btn" onClick={() => setKorzinkaModal()}>
           <IoCloseOutline />
         </button>
         <div className="modal-box">
-          {orderFoods.length > 0 && (
-            <ul className="modal-list">
-              {orderFoods.map((food) => (
-                <li className="modal-item">
-                  <img className="modal-img" src={food.img} />
-                  <p className="modal-title">{food.title}</p>
-                  <div className="modal-blok">
-                    <button className="modal-minus" onClick={decrementCount}>
-                      -
-                    </button>
-                    <span className="modal-count">{food.count}</span>
-                    <button className="modal-plus" onClick={incrementCount}>
-                      +
-                    </button>
-                  </div>
-                  <p className="modal-price">
-                    {(food.price * food.count).toFixed(1)} сум
-                  </p>
-                  <button
-                    className="modal-btn"
-                    onClick={() => {
-                      setOrderFoods(
-                        orderFoods.filter((ovqat) => ovqat.id !== food.id)
-                      );
-                    }}>
-                    <RiDeleteBinLine />
+          <ul className="modal-list">
+            {orderFoods.map((food) => (
+              <li className="modal-item">
+                <img className="modal-img" src={food.img} />
+                <p className="modal-title">{food.title}</p>
+                <div className="modal-blok">
+                  <button className="modal-minus" onClick={decrementCount}>
+                    -
                   </button>
-                </li>
-              ))}
-            </ul>
-          )}
+                  <span className="modal-count">{food.count}</span>
+                  <button className="modal-plus" onClick={incrementCount}>
+                    +
+                  </button>
+                </div>
+                <p className="modal-price">
+                  {(food.price * food.count).toFixed(1)} сум
+                </p>
+                <button
+                  className="modal-btn"
+                  onClick={() => {
+                    setOrderFoods(
+                      orderFoods.filter((ovqat) => ovqat.id !== food.id)
+                    );
+                  }}>
+                  <RiDeleteBinLine />
+                </button>
+              </li>
+            ))}
+            <div className="navbar-bottom">
+              <Button onClick={handleOpen} variant="contained">
+                Contact
+              </Button>
+            </div>
+          </ul>
         </div>
+      </SModal>
+
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description">
+        <Box sx={style}>
+          <TextField
+            value={nameValue}
+            onChange={(e) => changeName(e.target.value)}
+            size="large"
+            placeholder="Name"
+            className="navbar-input"
+            sx={{ margin: "15px" }}
+          />
+          <TextField
+            value={numberValue}
+            onChange={(e) => changeNumber(e.target.value)}
+            size="large"
+            placeholder="Telefon raqam"
+            className="navbar-input"
+            sx={{ margin: "15px" }}
+          />
+          <Button
+            sx={{ margin: "15px" }}
+            variant="contained"
+            onClick={() => sendMessage()}>
+            Submit
+          </Button>
+        </Box>
       </Modal>
     </div>
   );
